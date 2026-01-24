@@ -16,8 +16,8 @@ const categoryConfig = {
     title: "Adventure Kits",
     description: "Bring the stories to life! Each kit contains everything you need to create your own stuffed adventure companion.",
     emptyIcon: Package,
-    emptyTitle: "No kits yet",
-    emptyDescription: "Adventure kits are coming soon! Tell me about your kits in the chat and I'll add them to your store.",
+    emptyTitle: "Adventure kits are coming soon!",
+    emptyDescription: "Fun cooking kits are coming soon — yummy recipes, cute characters, and big adventures!",
   },
   merch: {
     icon: "👕",

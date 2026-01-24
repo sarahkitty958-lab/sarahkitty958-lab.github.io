@@ -160,7 +160,7 @@ export default function AdminStories() {
                       )}
                     </Button>
                     <Button asChild variant="ghost" size="icon">
-                      <Link to={`/admin/stories/${story.id}`}>
+                      <Link to={`/admin/stories/${story.id}/edit`}>
                         <Edit className="w-4 h-4" />
                       </Link>
                     </Button>

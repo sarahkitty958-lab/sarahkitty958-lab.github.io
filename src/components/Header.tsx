@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
-import { Book, ShoppingBag, HelpCircle, Info, Home, User, Settings, Package } from "lucide-react";
+import { Book, ShoppingBag, HelpCircle, Info, Home, User, Settings, Package, MessageSquare, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { AuthModal } from "./AuthModal";
 import { useState } from "react";
@@ -90,7 +90,7 @@ export const Header = () => {
                   <>
                     <DropdownMenuItem asChild>
                       <Link to="/admin/stories" className="flex items-center gap-2">
-                        <Settings className="w-4 h-4" />
+                        <Book className="w-4 h-4" />
                         Manage Stories
                       </Link>
                     </DropdownMenuItem>
@@ -98,6 +98,18 @@ export const Header = () => {
                       <Link to="/admin/kits" className="flex items-center gap-2">
                         <Package className="w-4 h-4" />
                         Manage Kits
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/questions" className="flex items-center gap-2">
+                        <MessageSquare className="w-4 h-4" />
+                        Manage Q&A
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/users" className="flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        Manage Admins
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

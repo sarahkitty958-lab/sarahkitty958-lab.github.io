@@ -73,6 +73,42 @@ export type Database = {
         }
         Relationships: []
       }
+      questions: {
+        Row: {
+          answer: string | null
+          answered_at: string | null
+          answered_by: string | null
+          asked_by: string | null
+          asked_by_name: string | null
+          created_at: string
+          id: string
+          is_published: boolean | null
+          question: string
+        }
+        Insert: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          asked_by?: string | null
+          asked_by_name?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          question: string
+        }
+        Update: {
+          answer?: string | null
+          answered_at?: string | null
+          answered_by?: string | null
+          asked_by?: string | null
+          asked_by_name?: string | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          question?: string
+        }
+        Relationships: []
+      }
       stories: {
         Row: {
           content: string

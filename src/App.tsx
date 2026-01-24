@@ -11,6 +11,8 @@ import Stories from "./pages/Stories";
 import StoryDetail from "./pages/StoryDetail";
 import AdminStories from "./pages/admin/AdminStories";
 import StoryEditor from "./pages/admin/StoryEditor";
+import AdminKits from "./pages/admin/AdminKits";
+import KitEditor from "./pages/admin/KitEditor";
 import Shop from "./pages/Shop";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
@@ -30,6 +32,9 @@ function AppContent() {
         <Route path="/admin/stories" element={<AdminStories />} />
         <Route path="/admin/stories/new" element={<StoryEditor />} />
         <Route path="/admin/stories/:id/edit" element={<StoryEditor />} />
+        <Route path="/admin/kits" element={<AdminKits />} />
+        <Route path="/admin/kits/new" element={<KitEditor />} />
+        <Route path="/admin/kits/:id/edit" element={<KitEditor />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<About />} />

@@ -82,7 +82,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   id="displayName"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  placeholder="Your name"
+                  placeholder="e.g. Ricie SA Crew"
                   required={mode === 'signup'}
                 />
               </div>
@@ -95,7 +95,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="e.g. RicieSACrew@MewMew.com"
                 required
               />
             </div>

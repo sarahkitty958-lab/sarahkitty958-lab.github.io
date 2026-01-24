@@ -81,8 +81,8 @@ export default function AdminKits() {
               </Link>
             </Button>
             <div>
-              <h1 className="font-display text-3xl font-bold">Manage Kits</h1>
-              <p className="text-muted-foreground">Add, edit, and manage your craft kits</p>
+              <h1 className="font-display text-3xl font-bold">Manage Cooking Kits</h1>
+              <p className="text-muted-foreground">Add, edit, and manage your cooking kits</p>
             </div>
           </div>
           <Button asChild>
@@ -101,8 +101,8 @@ export default function AdminKits() {
           <Card>
             <CardContent className="py-12 text-center">
               <Package className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-              <h3 className="font-display text-xl font-semibold mb-2">No kits yet</h3>
-              <p className="text-muted-foreground mb-4">Start by adding your first craft kit!</p>
+              <h3 className="font-display text-xl font-semibold mb-2">No cooking kits yet</h3>
+              <p className="text-muted-foreground mb-4">Start by adding your first cooking kit!</p>
               <Button asChild>
                 <Link to="/admin/kits/new">
                   <Plus className="w-4 h-4 mr-2" />

@@ -14,9 +14,7 @@ interface Comment {
   content: string;
   created_at: string;
   user_id: string;
-  profiles: {
-    display_name: string | null;
-  } | null;
+  display_name: string | null;
 }
 
 interface CommentsSectionProps {
@@ -36,23 +34,37 @@ export function CommentsSection({ storyId }: CommentsSectionProps) {
   }, [storyId]);
 
   const fetchComments = async () => {
-    const { data, error } = await supabase
+    // Fetch comments first
+    const { data: commentsData, error: commentsError } = await supabase
       .from('comments')
-      .select(`
-        id,
-        content,
-        created_at,
-        user_id,
-        profiles (
-          display_name
-        )
-      `)
+      .select('id, content, created_at, user_id')
       .eq('story_id', storyId)
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setComments(data as Comment[]);
+    if (commentsError || !commentsData) {
+      setLoading(false);
+      return;
     }
+
+    // Get unique user IDs and fetch their profiles
+    const userIds = [...new Set(commentsData.map(c => c.user_id))];
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('user_id, display_name')
+      .in('user_id', userIds);
+
+    // Create a map of user_id to display_name
+    const profileMap = new Map(
+      profilesData?.map(p => [p.user_id, p.display_name]) || []
+    );
+
+    // Merge comments with profile data
+    const enrichedComments: Comment[] = commentsData.map(comment => ({
+      ...comment,
+      display_name: profileMap.get(comment.user_id) || null
+    }));
+
+    setComments(enrichedComments);
     setLoading(false);
   };
 
@@ -142,7 +154,7 @@ export function CommentsSection({ storyId }: CommentsSectionProps) {
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="font-semibold">
-                        {comment.profiles?.display_name || 'Anonymous'}
+                        {comment.display_name || 'Anonymous'}
                       </span>
                       <span className="text-sm text-muted-foreground">
                         {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}

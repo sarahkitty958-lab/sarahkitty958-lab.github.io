@@ -13,7 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { Camera, Upload, Sparkles, User, MapPin, Bell, Lock } from 'lucide-react';
+import { Camera, Upload, Sparkles, User, MapPin, Bell, Lock, CreditCard } from 'lucide-react';
 
 interface Profile {
   display_name: string | null;
@@ -25,6 +25,8 @@ interface Profile {
   shipping_zip: string | null;
   shipping_country: string | null;
   notifications_enabled: boolean | null;
+  card_last_four: string | null;
+  card_brand: string | null;
 }
 
 interface CharacterAvatar {
@@ -53,6 +55,11 @@ export default function Account() {
   const [shippingZip, setShippingZip] = useState('');
   const [shippingCountry, setShippingCountry] = useState('USA');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  
+  // Card info (display only - last 4 digits)
+  const [cardLastFour, setCardLastFour] = useState('');
+  const [cardBrand, setCardBrand] = useState('');
+  const [newCardNumber, setNewCardNumber] = useState('');
   
   // Password change
   const [currentPassword, setCurrentPassword] = useState('');
@@ -92,6 +99,8 @@ export default function Account() {
       setShippingZip(data.shipping_zip || '');
       setShippingCountry(data.shipping_country || 'USA');
       setNotificationsEnabled(data.notifications_enabled ?? true);
+      setCardLastFour(data.card_last_four || '');
+      setCardBrand(data.card_brand || '');
     }
     setLoading(false);
   };
@@ -130,6 +139,68 @@ export default function Account() {
     } else {
       toast.success('Profile updated! ✨');
       fetchProfile();
+    }
+    setSaving(false);
+  };
+
+  const handleSaveCard = async () => {
+    if (!user) return;
+    
+    // Validate card number format (basic validation)
+    const cleanNumber = newCardNumber.replace(/\s/g, '');
+    if (cleanNumber.length < 13 || cleanNumber.length > 19) {
+      toast.error('Please enter a valid card number 💳');
+      return;
+    }
+    
+    // Detect card brand
+    let brand = 'Card';
+    if (cleanNumber.startsWith('4')) brand = 'Visa';
+    else if (/^5[1-5]/.test(cleanNumber) || /^2[2-7]/.test(cleanNumber)) brand = 'Mastercard';
+    else if (/^3[47]/.test(cleanNumber)) brand = 'Amex';
+    else if (/^6(?:011|5)/.test(cleanNumber)) brand = 'Discover';
+    
+    // Store only last 4 digits
+    const lastFour = cleanNumber.slice(-4);
+    
+    setSaving(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        card_last_four: lastFour,
+        card_brand: brand,
+      })
+      .eq('user_id', user.id);
+    
+    if (error) {
+      toast.error('Failed to save card 😢');
+    } else {
+      toast.success('Card saved securely! 💳');
+      setCardLastFour(lastFour);
+      setCardBrand(brand);
+      setNewCardNumber('');
+    }
+    setSaving(false);
+  };
+
+  const handleRemoveCard = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        card_last_four: null,
+        card_brand: null,
+      })
+      .eq('user_id', user.id);
+    
+    if (error) {
+      toast.error('Failed to remove card 😢');
+    } else {
+      toast.success('Card removed!');
+      setCardLastFour('');
+      setCardBrand('');
     }
     setSaving(false);
   };
@@ -314,7 +385,7 @@ export default function Account() {
         </Card>
         
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile" className="gap-1">
               <User className="w-4 h-4 hidden sm:inline" />
               Profile
@@ -322,6 +393,10 @@ export default function Account() {
             <TabsTrigger value="shipping" className="gap-1">
               <MapPin className="w-4 h-4 hidden sm:inline" />
               Shipping
+            </TabsTrigger>
+            <TabsTrigger value="payment" className="gap-1">
+              <CreditCard className="w-4 h-4 hidden sm:inline" />
+              Card
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-1">
               <Bell className="w-4 h-4 hidden sm:inline" />
@@ -489,6 +564,77 @@ export default function Account() {
                 <Button onClick={handleSaveProfile} disabled={saving} className="w-full">
                   {saving ? 'Saving...' : 'Save Preferences 🔔'}
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          {/* Payment Tab */}
+          <TabsContent value="payment">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="w-5 h-5" />
+                  Payment Card
+                </CardTitle>
+                <CardDescription>
+                  Save a card for faster checkout! 💳
+                  <br />
+                  <span className="text-xs text-muted-foreground/70">
+                    Only you can see this info - not even admins!
+                  </span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {cardLastFour ? (
+                  <div className="p-4 rounded-lg bg-gradient-to-br from-primary/10 to-accent/10 border">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-8 bg-gradient-to-r from-primary to-accent rounded flex items-center justify-center text-white text-xs font-bold">
+                          {cardBrand === 'Visa' ? 'VISA' : 
+                           cardBrand === 'Mastercard' ? 'MC' : 
+                           cardBrand === 'Amex' ? 'AMEX' : '💳'}
+                        </div>
+                        <div>
+                          <p className="font-medium">{cardBrand}</p>
+                          <p className="text-sm text-muted-foreground">•••• •••• •••• {cardLastFour}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={handleRemoveCard}
+                        disabled={saving}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <Label htmlFor="cardNumber">Card Number</Label>
+                      <Input
+                        id="cardNumber"
+                        type="text"
+                        value={newCardNumber}
+                        onChange={(e) => setNewCardNumber(e.target.value.replace(/[^0-9\s]/g, ''))}
+                        placeholder="1234 5678 9012 3456"
+                        maxLength={19}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        We only store the last 4 digits for your security 🔒
+                      </p>
+                    </div>
+                    
+                    <Button 
+                      onClick={handleSaveCard} 
+                      disabled={saving || !newCardNumber}
+                      className="w-full"
+                    >
+                      {saving ? 'Saving...' : 'Save Card 💳'}
+                    </Button>
+                  </>
+                )}
               </CardContent>
             </Card>
           </TabsContent>

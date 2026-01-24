@@ -154,6 +154,8 @@ export default function StoryEditor() {
   };
 
   const handleSave = async () => {
+    console.log('handleSave called', { title, content, user: user?.id });
+    
     if (!title.trim() || !content.trim()) {
       toast.error('Title and content are required');
       return;
@@ -165,6 +167,7 @@ export default function StoryEditor() {
       let storyId = id;
 
       if (isNew) {
+        console.log('Creating new story...');
         const { data, error } = await supabase
           .from('stories')
           .insert({
@@ -177,6 +180,7 @@ export default function StoryEditor() {
           .select('id')
           .single();
 
+        console.log('Insert result:', { data, error });
         if (error) throw error;
         storyId = data.id;
       } else {

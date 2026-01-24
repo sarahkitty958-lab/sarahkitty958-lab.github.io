@@ -14,7 +14,7 @@ export const Hero = () => {
       <div className="container relative z-10 text-center px-4">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 text-secondary-foreground mb-6 animate-bounce-slow">
           <Sparkles className="w-4 h-4" />
-          <span className="text-sm font-medium">Magical Stories & Craft Kits</span>
+          <span className="text-sm font-medium">Cooking Kits</span>
         </div>
         
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">

@@ -425,7 +425,7 @@ export default function Account() {
                     id="displayName"
                     value={displayName}
                     onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Your awesome name"
+                    placeholder="e.g. Ricie SA Crew"
                   />
                 </div>
                 
@@ -447,7 +447,7 @@ export default function Account() {
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(555) 123-4567"
+                    placeholder="e.g. (555) MEW-MEOW"
                   />
                 </div>
                 
@@ -475,7 +475,7 @@ export default function Account() {
                     id="address"
                     value={shippingAddress}
                     onChange={(e) => setShippingAddress(e.target.value)}
-                    placeholder="123 Teddy Bear Lane"
+                    placeholder="e.g. 123 Stuffed Adventure Lane"
                   />
                 </div>
                 
@@ -486,7 +486,7 @@ export default function Account() {
                       id="city"
                       value={shippingCity}
                       onChange={(e) => setShippingCity(e.target.value)}
-                      placeholder="Stuffington"
+                      placeholder="e.g. Mice"
                     />
                   </div>
                   <div className="space-y-2">
@@ -495,7 +495,7 @@ export default function Account() {
                       id="state"
                       value={shippingState}
                       onChange={(e) => setShippingState(e.target.value)}
-                      placeholder="CA"
+                      placeholder="e.g. Meowtah"
                     />
                   </div>
                 </div>
@@ -507,7 +507,7 @@ export default function Account() {
                       id="zip"
                       value={shippingZip}
                       onChange={(e) => setShippingZip(e.target.value)}
-                      placeholder="12345"
+                      placeholder="e.g. 12345"
                     />
                   </div>
                   <div className="space-y-2">
@@ -516,7 +516,7 @@ export default function Account() {
                       id="country"
                       value={shippingCountry}
                       onChange={(e) => setShippingCountry(e.target.value)}
-                      placeholder="USA"
+                      placeholder="e.g. United States of Animals (USA)"
                     />
                   </div>
                 </div>

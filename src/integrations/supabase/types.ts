@@ -73,6 +73,8 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          card_brand: string | null
+          card_last_four: string | null
           created_at: string
           display_name: string | null
           id: string
@@ -89,6 +91,8 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          card_brand?: string | null
+          card_last_four?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -105,6 +109,8 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          card_brand?: string | null
+          card_last_four?: string | null
           created_at?: string
           display_name?: string | null
           id?: string
@@ -275,7 +281,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_admin_view: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          display_name: string | null
+          id: string | null
+          notifications_enabled: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          notifications_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          id?: string | null
+          notifications_enabled?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {

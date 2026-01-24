@@ -68,50 +68,51 @@ export const Header = () => {
         </nav>
 
         <div className="flex items-center gap-2">
-          {!loading && (
-            <>
-              {user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <User className="w-4 h-4" />
-                      Account
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="text-muted-foreground text-sm">
-                      {user.email}
+          {loading ? (
+            <Button variant="outline" size="sm" disabled className="gap-2">
+              <User className="w-4 h-4" />
+              ...
+            </Button>
+          ) : user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="w-4 h-4" />
+                  Account
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="text-muted-foreground text-sm">
+                  {user.email}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {isAdmin && (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/stories" className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        Manage Stories
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/kits" className="flex items-center gap-2">
+                        <Package className="w-4 h-4" />
+                        Manage Kits
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    {isAdmin && (
-                      <>
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin/stories" className="flex items-center gap-2">
-                            <Settings className="w-4 h-4" />
-                            Manage Stories
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                          <Link to="/admin/kits" className="flex items-center gap-2">
-                            <Package className="w-4 h-4" />
-                            Manage Kits
-                          </Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                      </>
-                    )}
-                    <DropdownMenuItem onClick={handleSignOut}>
-                      Sign Out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button onClick={() => setAuthModalOpen(true)} size="sm">
-                  <User className="w-4 h-4 mr-2" />
-                  Sign In
-                </Button>
-              )}
-            </>
+                  </>
+                )}
+                <DropdownMenuItem onClick={handleSignOut}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button onClick={() => setAuthModalOpen(true)} size="sm">
+              <User className="w-4 h-4 mr-2" />
+              Sign In
+            </Button>
           )}
           <CartDrawer />
         </div>

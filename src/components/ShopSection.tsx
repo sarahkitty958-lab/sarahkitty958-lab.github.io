@@ -30,7 +30,7 @@ const categoryConfig = {
   "books-maps": {
     icon: "📚",
     title: "Books & Maps",
-    description: "Explore Lucky's world with our storybooks, adventure maps, and collectible prints!",
+    description: "Explore the Stuffed Adventures crew's world with our storybooks, adventure maps, and collectible prints!",
     emptyIcon: BookOpen,
     emptyTitle: "No books or maps yet",
     emptyDescription: "Storybooks and adventure maps are coming soon! Stay tuned for magical tales.",

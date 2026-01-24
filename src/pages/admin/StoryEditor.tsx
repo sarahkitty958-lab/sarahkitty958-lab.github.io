@@ -39,17 +39,19 @@ export default function StoryEditor() {
   const [uploadingMedia, setUploadingMedia] = useState(false);
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
+    // Only redirect if auth is fully loaded AND user is not admin
+    if (!authLoading && !isAdmin && user !== undefined) {
+      console.log('Access denied - not admin', { authLoading, isAdmin, user: user?.id });
       navigate('/');
       toast.error('Access denied');
     }
-  }, [isAdmin, authLoading, navigate]);
+  }, [isAdmin, authLoading, navigate, user]);
 
   useEffect(() => {
-    if (!isNew && id && isAdmin) {
+    if (!isNew && id && !authLoading && isAdmin) {
       fetchStory();
     }
-  }, [id, isNew, isAdmin]);
+  }, [id, isNew, isAdmin, authLoading]);
 
   const fetchStory = async () => {
     const { data: storyData, error } = await supabase
@@ -229,10 +231,25 @@ export default function StoryEditor() {
     setSaving(false);
   };
 
-  if (authLoading || loading) {
+  // Show loading only while auth is being determined
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="animate-wiggle text-6xl">📝</div>
+        <div className="animate-bounce text-6xl">📝</div>
+      </div>
+    );
+  }
+
+  // If not admin after auth loaded, the useEffect will redirect
+  if (!isAdmin) {
+    return null;
+  }
+
+  // Show loading while fetching existing story data
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-bounce text-6xl">📖</div>
       </div>
     );
   }

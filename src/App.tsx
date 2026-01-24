@@ -13,6 +13,8 @@ import AdminStories from "./pages/admin/AdminStories";
 import StoryEditor from "./pages/admin/StoryEditor";
 import AdminKits from "./pages/admin/AdminKits";
 import KitEditor from "./pages/admin/KitEditor";
+import AdminQuestions from "./pages/admin/AdminQuestions";
+import AdminUsers from "./pages/admin/AdminUsers";
 import Shop from "./pages/Shop";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
@@ -35,6 +37,8 @@ function AppContent() {
         <Route path="/admin/kits" element={<AdminKits />} />
         <Route path="/admin/kits/new" element={<KitEditor />} />
         <Route path="/admin/kits/:id/edit" element={<KitEditor />} />
+        <Route path="/admin/questions" element={<AdminQuestions />} />
+        <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<About />} />

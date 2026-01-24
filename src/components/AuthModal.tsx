@@ -3,11 +3,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { TermsModal } from './TermsModal';
-import { supabase } from '@/integrations/supabase/client';
+import { CheckCircle, Circle } from 'lucide-react';
 
 interface AuthModalProps {
   open: boolean;
@@ -20,6 +19,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [hasReadTerms, setHasReadTerms] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const { signIn, signUp } = useAuth();
@@ -28,7 +28,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     e.preventDefault();
     
     if (mode === 'signup' && !termsAccepted) {
-      toast.error('Please agree to the terms & conditions! 📜');
+      toast.error('Please read and accept the terms & conditions! 📜');
       return;
     }
     
@@ -62,6 +62,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setPassword('');
     setDisplayName('');
     setTermsAccepted(false);
+    setHasReadTerms(false);
+  };
+
+  const handleOpenTerms = () => {
+    setTermsOpen(true);
+  };
+
+  const handleTermsAccepted = () => {
+    setHasReadTerms(true);
+    setTermsAccepted(true);
   };
 
   return (
@@ -114,32 +124,78 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
             </div>
             
             {mode === 'signup' && (
-              <div className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50 border-2 border-dashed border-primary/20">
-                <Checkbox
-                  id="terms"
-                  checked={termsAccepted}
-                  onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                  className="mt-0.5"
-                />
-                <div className="text-sm leading-relaxed">
-                  <label htmlFor="terms" className="cursor-pointer">
-                    I agree to be a kind member of the Stuffed Adventures family and accept the{' '}
-                    <button
-                      type="button"
-                      onClick={() => setTermsOpen(true)}
-                      className="text-primary hover:underline font-medium"
-                    >
-                      Terms & Conditions
-                    </button>
-                    {' '}🤝
-                  </label>
+              <div className="space-y-3">
+                <div 
+                  className={`p-4 rounded-lg border-2 transition-all ${
+                    termsAccepted 
+                      ? 'bg-primary/10 border-primary/30' 
+                      : 'bg-muted/50 border-dashed border-primary/20'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5">
+                      {termsAccepted ? (
+                        <CheckCircle className="w-5 h-5 text-primary" />
+                      ) : (
+                        <Circle className="w-5 h-5 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 text-sm leading-relaxed">
+                      {termsAccepted ? (
+                        <p className="text-foreground">
+                          ✅ You've read and accepted the{' '}
+                          <button
+                            type="button"
+                            onClick={handleOpenTerms}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            Terms & Conditions
+                          </button>
+                          ! 🎉
+                        </p>
+                      ) : (
+                        <p className="text-muted-foreground">
+                          Before joining, please read our{' '}
+                          <button
+                            type="button"
+                            onClick={handleOpenTerms}
+                            className="text-primary hover:underline font-medium"
+                          >
+                            Terms & Conditions
+                          </button>
+                          {' '}to become part of the Stuffed Adventures family! 📜
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
+                
+                {!termsAccepted && (
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    onClick={handleOpenTerms}
+                    className="w-full"
+                  >
+                    📖 Read Terms & Conditions
+                  </Button>
+                )}
               </div>
             )}
             
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={loading || (mode === 'signup' && !termsAccepted)}
+            >
               {loading ? '...' : mode === 'login' ? 'Sign In' : 'Create Account'}
             </Button>
+            
+            {mode === 'signup' && !termsAccepted && (
+              <p className="text-xs text-center text-muted-foreground">
+                You must read and accept the terms to create an account
+              </p>
+            )}
           </form>
           
           <div className="text-center text-sm text-muted-foreground">
@@ -168,7 +224,12 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         </DialogContent>
       </Dialog>
       
-      <TermsModal open={termsOpen} onOpenChange={setTermsOpen} />
+      <TermsModal 
+        open={termsOpen} 
+        onOpenChange={setTermsOpen}
+        onAccept={handleTermsAccepted}
+        requireRead={true}
+      />
     </>
   );
 }

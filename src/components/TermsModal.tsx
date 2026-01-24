@@ -1,15 +1,45 @@
+import { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Heart } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, CheckCircle } from 'lucide-react';
 
 interface TermsModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onAccept?: () => void;
+  requireRead?: boolean;
 }
 
-export function TermsModal({ open, onOpenChange }: TermsModalProps) {
+export function TermsModal({ open, onOpenChange, onAccept, requireRead = false }: TermsModalProps) {
+  const [hasScrolledToBottom, setHasScrolledToBottom] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    const target = event.target as HTMLDivElement;
+    const isAtBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
+    if (isAtBottom) {
+      setHasScrolledToBottom(true);
+    }
+  };
+
+  const handleAccept = () => {
+    onAccept?.();
+    onOpenChange(false);
+  };
+
+  const handleClose = (open: boolean) => {
+    if (!open) {
+      // Reset scroll state when closing without accepting
+      if (!hasScrolledToBottom) {
+        setHasScrolledToBottom(false);
+      }
+    }
+    onOpenChange(open);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg max-h-[80vh]">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl text-center flex items-center justify-center gap-2">
@@ -22,8 +52,8 @@ export function TermsModal({ open, onOpenChange }: TermsModalProps) {
           </DialogDescription>
         </DialogHeader>
         
-        <ScrollArea className="h-[400px] pr-4">
-          <div className="space-y-6 text-sm">
+        <ScrollArea className="h-[350px] pr-4" onScrollCapture={handleScroll}>
+          <div ref={scrollRef} className="space-y-6 text-sm">
             <section>
               <h3 className="font-display font-semibold text-lg mb-2 flex items-center gap-2">
                 <Heart className="w-4 h-4 text-primary" />
@@ -40,7 +70,8 @@ export function TermsModal({ open, onOpenChange }: TermsModalProps) {
               <ul className="list-disc list-inside text-muted-foreground space-y-1 leading-relaxed">
                 <li>Keep your password secret (like a special recipe!)</li>
                 <li>Be yourself - one account per person please</li>
-                <li>You must be 13+ to have an account (with parental permission if under 18)</li>
+                <li>You must be 7 or older to have an account</li>
+                <li>If you're under 18, you need a parent or guardian's permission</li>
               </ul>
             </section>
             
@@ -94,6 +125,30 @@ export function TermsModal({ open, onOpenChange }: TermsModalProps) {
             </div>
           </div>
         </ScrollArea>
+
+        {requireRead && (
+          <div className="space-y-3 pt-2">
+            {!hasScrolledToBottom && (
+              <p className="text-xs text-center text-muted-foreground animate-pulse">
+                📜 Please scroll down to read all the terms...
+              </p>
+            )}
+            <Button 
+              onClick={handleAccept} 
+              disabled={!hasScrolledToBottom}
+              className="w-full"
+            >
+              {hasScrolledToBottom ? (
+                <>
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  I've Read & Accept the Terms
+                </>
+              ) : (
+                'Please read the terms first...'
+              )}
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

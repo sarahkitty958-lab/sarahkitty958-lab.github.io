@@ -2,6 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 // Placeholder stories - will be replaced with actual content
 const placeholderStories = [
@@ -29,16 +30,23 @@ const placeholderStories = [
 ];
 
 export const StoriesSection = () => {
+  const { data: content } = useSiteContent("stories_section");
+  
+  const c = content?.content as Record<string, string> | undefined;
+  const emoji = c?.emoji ?? "📖";
+  const title = c?.title ?? "Our Stories";
+  const description = c?.description ?? "Dive into magical worlds where stuffed animals come alive with friendship, courage, and adventure.";
+
   return (
     <section id="stories" className="py-20 bg-muted/30">
       <div className="container px-4">
         <div className="text-center mb-12">
-          <span className="text-5xl mb-4 block">📖</span>
+          <span className="text-5xl mb-4 block">{emoji}</span>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            Our Stories
+            {title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Dive into magical worlds where stuffed animals come alive with friendship, courage, and adventure.
+            {description}
           </p>
         </div>
         

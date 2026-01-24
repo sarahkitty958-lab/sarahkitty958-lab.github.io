@@ -1,7 +1,18 @@
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Sparkles } from "lucide-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const Hero = () => {
+  const { data: content } = useSiteContent("hero");
+  
+  const c = content?.content as Record<string, string> | undefined;
+  const badge = c?.badge ?? "Fun Stories & Cooking Kits";
+  const titleLine1 = c?.title_line1 ?? "Welcome to";
+  const titleLine2 = c?.title_line2 ?? "Stuffed Adventures";
+  const description = c?.description ?? "Discover heartwarming tales of cuddly companions and bring their adventures to life with our magical cooking kits!";
+  const buttonStories = c?.button_stories ?? "📚 Read Stories";
+  const buttonShop = c?.button_shop ?? "🎨 Shop Kits";
+
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       {/* Background decorations */}
@@ -14,19 +25,18 @@ export const Hero = () => {
       <div className="container relative z-10 text-center px-4">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 text-secondary-foreground mb-6 animate-bounce-slow">
           <Sparkles className="w-4 h-4" />
-          <span className="text-sm font-medium">Fun Stories & Cooking Kits</span>
+          <span className="text-sm font-medium">{badge}</span>
         </div>
         
         <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
-          <span className="block">Welcome to</span>
+          <span className="block">{titleLine1}</span>
           <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
-            Stuffed Adventures
+            {titleLine2}
           </span>
         </h1>
         
         <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          Discover heartwarming tales of cuddly companions and bring their adventures to life 
-          with our magical craft kits!
+          {description}
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -35,7 +45,7 @@ export const Hero = () => {
             className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-glow hover:shadow-float transition-all duration-300 text-lg px-8"
             onClick={() => document.getElementById('stories')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            📚 Read Stories
+            {buttonStories}
           </Button>
           <Button 
             size="lg" 
@@ -43,7 +53,7 @@ export const Hero = () => {
             className="border-2 border-accent text-accent-foreground hover:bg-accent/10 text-lg px-8"
             onClick={() => document.getElementById('shop')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            🎨 Shop Kits
+            {buttonShop}
           </Button>
         </div>
         

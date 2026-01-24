@@ -15,6 +15,7 @@ import AdminKits from "./pages/admin/AdminKits";
 import KitEditor from "./pages/admin/KitEditor";
 import AdminQuestions from "./pages/admin/AdminQuestions";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminContent from "./pages/admin/AdminContent";
 import Shop from "./pages/Shop";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
@@ -39,6 +40,7 @@ function AppContent() {
         <Route path="/admin/kits/:id/edit" element={<KitEditor />} />
         <Route path="/admin/questions" element={<AdminQuestions />} />
         <Route path="/admin/users" element={<AdminUsers />} />
+        <Route path="/admin/content" element={<AdminContent />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<About />} />

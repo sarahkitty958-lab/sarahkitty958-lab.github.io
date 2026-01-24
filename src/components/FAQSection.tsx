@@ -4,6 +4,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 const faqs = [
   {
@@ -11,8 +12,8 @@ const faqs = [
     answer: "Stuffed Adventures are heartwarming short stories featuring lovable stuffed animal characters going on magical journeys. Each story teaches valuable lessons about friendship, courage, and kindness in a fun and engaging way."
   },
   {
-    question: "What's included in the Adventure Kits?",
-    answer: "Each Adventure Kit contains everything you need to create your own stuffed companion based on the story characters. Kits typically include patterns, materials, step-by-step instructions, and special touches that bring the story to life."
+    question: "What's included in the Cooking Kits?",
+    answer: "Each Cooking Kit contains everything you need to create delicious recipes inspired by the story characters. Kits typically include ingredient lists, step-by-step instructions, and special touches that bring the story to life."
   },
   {
     question: "What age group are the stories suitable for?",
@@ -33,16 +34,23 @@ const faqs = [
 ];
 
 export const FAQSection = () => {
+  const { data: content } = useSiteContent("faq_section");
+  
+  const c = content?.content as Record<string, string> | undefined;
+  const emoji = c?.emoji ?? "❓";
+  const title = c?.title ?? "Questions & Answers";
+  const description = c?.description ?? "Got questions? We've got answers! Here's everything you need to know.";
+
   return (
     <section id="faq" className="py-20 bg-muted/30">
       <div className="container px-4 max-w-3xl">
         <div className="text-center mb-12">
-          <span className="text-5xl mb-4 block">❓</span>
+          <span className="text-5xl mb-4 block">{emoji}</span>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            Questions & Answers
+            {title}
           </h2>
           <p className="text-muted-foreground text-lg">
-            Got questions? We've got answers! Here's everything you need to know.
+            {description}
           </p>
         </div>
 

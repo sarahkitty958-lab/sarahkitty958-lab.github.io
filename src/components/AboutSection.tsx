@@ -1,16 +1,32 @@
 import { Heart, Sparkles, Users } from "lucide-react";
+import { useSiteContent } from "@/hooks/useSiteContent";
 
 export const AboutSection = () => {
+  const { data: content } = useSiteContent("about_section");
+  
+  const c = content?.content as Record<string, string> | undefined;
+  const emoji = c?.emoji ?? "💝";
+  const title = c?.title ?? "About Stuffed Adventures";
+  const description = c?.description ?? "Where imagination meets creation, and every stuffed friend has a story to tell.";
+  const missionTitle = c?.mission_title ?? "Our Mission";
+  const missionText = c?.mission_text ?? "At Stuffed Adventures, we believe every child deserves magical stories that inspire wonder and creativity. We're on a mission to bring families closer together through storytelling and the joy of making something beautiful with your own hands. Each stuffed friend you create becomes a companion for adventures yet to come.";
+  const card1Title = c?.card1_title ?? "Made with Love";
+  const card1Text = c?.card1_text ?? "Every story and kit is crafted with care and attention to detail, designed to spark joy and creativity.";
+  const card2Title = c?.card2_title ?? "Inspiring Creativity";
+  const card2Text = c?.card2_text ?? "Our kits encourage hands-on creativity, helping children (and adults!) bring their favorite characters to life.";
+  const card3Title = c?.card3_title ?? "Family Bonding";
+  const card3Text = c?.card3_text ?? "Reading together and crafting creates precious memories. These adventures are made to be shared.";
+
   return (
     <section id="about" className="py-20">
       <div className="container px-4">
         <div className="text-center mb-12">
-          <span className="text-5xl mb-4 block">💝</span>
+          <span className="text-5xl mb-4 block">{emoji}</span>
           <h2 className="font-display text-4xl md:text-5xl font-bold mb-4">
-            About Stuffed Adventures
+            {title}
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Where imagination meets creation, and every stuffed friend has a story to tell.
+            {description}
           </p>
         </div>
 
@@ -19,9 +35,9 @@ export const AboutSection = () => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
               <Heart className="w-8 h-8 text-primary" />
             </div>
-            <h3 className="font-display text-xl font-semibold mb-2">Made with Love</h3>
+            <h3 className="font-display text-xl font-semibold mb-2">{card1Title}</h3>
             <p className="text-muted-foreground">
-              Every story and kit is crafted with care and attention to detail, designed to spark joy and creativity.
+              {card1Text}
             </p>
           </div>
 
@@ -29,9 +45,9 @@ export const AboutSection = () => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary/20 flex items-center justify-center">
               <Sparkles className="w-8 h-8 text-secondary-foreground" />
             </div>
-            <h3 className="font-display text-xl font-semibold mb-2">Inspiring Creativity</h3>
+            <h3 className="font-display text-xl font-semibold mb-2">{card2Title}</h3>
             <p className="text-muted-foreground">
-              Our kits encourage hands-on creativity, helping children (and adults!) bring their favorite characters to life.
+              {card2Text}
             </p>
           </div>
 
@@ -39,20 +55,17 @@ export const AboutSection = () => {
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent/20 flex items-center justify-center">
               <Users className="w-8 h-8 text-accent-foreground" />
             </div>
-            <h3 className="font-display text-xl font-semibold mb-2">Family Bonding</h3>
+            <h3 className="font-display text-xl font-semibold mb-2">{card3Title}</h3>
             <p className="text-muted-foreground">
-              Reading together and crafting creates precious memories. These adventures are made to be shared.
+              {card3Text}
             </p>
           </div>
         </div>
 
         <div className="bg-card rounded-2xl p-8 md:p-12 border shadow-soft text-center">
-          <h3 className="font-display text-2xl font-bold mb-4">Our Mission</h3>
+          <h3 className="font-display text-2xl font-bold mb-4">{missionTitle}</h3>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
-            At Stuffed Adventures, we believe every child deserves magical stories that inspire wonder and 
-            creativity. We're on a mission to bring families closer together through storytelling and the 
-            joy of making something beautiful with your own hands. Each stuffed friend you create becomes 
-            a companion for adventures yet to come.
+            {missionText}
           </p>
           <div className="mt-8 flex justify-center gap-4 text-4xl">
             <span className="animate-wiggle">🧸</span>

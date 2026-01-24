@@ -16,9 +16,11 @@ import KitEditor from "./pages/admin/KitEditor";
 import AdminQuestions from "./pages/admin/AdminQuestions";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminContent from "./pages/admin/AdminContent";
+import AdminAvatars from "./pages/admin/AdminAvatars";
 import Shop from "./pages/Shop";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
+import Account from "./pages/Account";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +43,8 @@ function AppContent() {
         <Route path="/admin/questions" element={<AdminQuestions />} />
         <Route path="/admin/users" element={<AdminUsers />} />
         <Route path="/admin/content" element={<AdminContent />} />
+        <Route path="/admin/avatars" element={<AdminAvatars />} />
+        <Route path="/account" element={<Account />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<About />} />

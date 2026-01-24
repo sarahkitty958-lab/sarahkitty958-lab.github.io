@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      character_avatars: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_url: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_url?: string
+          name?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           content: string
@@ -52,6 +76,14 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          notifications_enabled: boolean | null
+          phone: string | null
+          shipping_address: string | null
+          shipping_city: string | null
+          shipping_country: string | null
+          shipping_state: string | null
+          shipping_zip: string | null
+          terms_accepted_at: string | null
           updated_at: string
           user_id: string
         }
@@ -60,6 +92,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          notifications_enabled?: boolean | null
+          phone?: string | null
+          shipping_address?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
+          terms_accepted_at?: string | null
           updated_at?: string
           user_id: string
         }
@@ -68,6 +108,14 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          notifications_enabled?: boolean | null
+          phone?: string | null
+          shipping_address?: string | null
+          shipping_city?: string | null
+          shipping_country?: string | null
+          shipping_state?: string | null
+          shipping_zip?: string | null
+          terms_accepted_at?: string | null
           updated_at?: string
           user_id?: string
         }

@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,8 @@ interface StoryMedia {
 
 export default function StoryEditor() {
   const { id } = useParams<{ id: string }>();
-  const isNew = id === 'new';
+  const location = useLocation();
+  const isNew = location.pathname.endsWith('/new') || id === 'new';
   const navigate = useNavigate();
   const { user, isAdmin, loading: authLoading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,12 +49,25 @@ export default function StoryEditor() {
   }, [isAdmin, authLoading, navigate, user]);
 
   useEffect(() => {
+    if (isNew) {
+      setLoading(false);
+      return;
+    }
+
     if (!isNew && id && !authLoading && isAdmin) {
+      setLoading(true);
       fetchStory();
     }
   }, [id, isNew, isAdmin, authLoading]);
 
   const fetchStory = async () => {
+    if (!id) {
+      toast.error('Story not found');
+      navigate('/admin/stories');
+      setLoading(false);
+      return;
+    }
+
     const { data: storyData, error } = await supabase
       .from('stories')
       .select('*')

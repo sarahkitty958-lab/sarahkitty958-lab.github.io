@@ -11,13 +11,31 @@ export function useAuth() {
   useEffect(() => {
     let mounted = true;
 
-    // Safety timeout - ensure loading is set to false within 3 seconds
-    const timeout = setTimeout(() => {
-      if (mounted) {
-        console.warn('Auth loading timeout - forcing loading state to false');
-        setLoading(false);
+    // IMPORTANT: subscribe first, then read the initial session.
+    // This avoids missing auth events and reduces UI flicker that can look like "logging out".
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (!mounted) return;
+        
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .eq('role', 'admin')
+            .maybeSingle();
+
+          if (mounted) setIsAdmin(!!roleData);
+        } else {
+          setIsAdmin(false);
+        }
+
+        if (mounted) setLoading(false);
       }
-    }, 3000);
+    );
 
     // Check initial session first
     const initAuth = async () => {
@@ -60,45 +78,12 @@ export function useAuth() {
       } finally {
         if (mounted) {
           setLoading(false);
-          clearTimeout(timeout);
           console.log('useAuth: Auth initialization complete');
         }
       }
     };
 
     initAuth();
-
-    // Set up auth state listener for changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (!mounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Check admin role directly from user_roles table
-          const { data: roleData, error: roleError } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', session.user.id)
-            .eq('role', 'admin')
-            .maybeSingle();
-          
-          console.log('Admin check (state change):', { roleData, roleError, userId: session.user.id });
-          
-          if (mounted) {
-            setIsAdmin(!!roleData);
-          }
-        } else {
-          setIsAdmin(false);
-        }
-        
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    );
 
     return () => {
       mounted = false;

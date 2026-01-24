@@ -35,7 +35,9 @@ export default function StoryEditor() {
   const [coverImageUrl, setCoverImageUrl] = useState('');
   const [published, setPublished] = useState(false);
   const [media, setMedia] = useState<StoryMedia[]>([]);
-  const [loading, setLoading] = useState(!isNew);
+  // Don't derive initial loading from isNew (which can be briefly wrong on first render);
+  // we explicitly toggle loading when fetching an existing story.
+  const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploadingMedia, setUploadingMedia] = useState(false);
 
@@ -111,10 +113,11 @@ export default function StoryEditor() {
 
     const { error } = await supabase.storage
       .from('story-media')
-      .upload(filePath, file);
+      .upload(filePath, file, { upsert: true });
 
     if (error) {
-      toast.error('Failed to upload file');
+      console.error('StoryEditor: upload failed', error);
+      toast.error(error.message || 'Failed to upload file');
       return null;
     }
 
@@ -177,6 +180,11 @@ export default function StoryEditor() {
       return;
     }
 
+    if (!user?.id) {
+      toast.error('You must be signed in to save');
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -194,10 +202,11 @@ export default function StoryEditor() {
             created_by: user?.id
           })
           .select('id')
-          .single();
+          .maybeSingle();
 
         console.log('Insert result:', { data, error });
         if (error) throw error;
+        if (!data?.id) throw new Error('Story created but no id was returned');
         storyId = data.id;
       } else {
         const { error } = await supabase
@@ -239,6 +248,7 @@ export default function StoryEditor() {
       toast.success(isNew ? 'Story created! 🎉' : 'Story saved! ✅');
       navigate('/admin/stories');
     } catch (error: any) {
+      console.error('StoryEditor: save failed', error);
       toast.error(error.message || 'Failed to save story');
     }
 
@@ -350,13 +360,14 @@ export default function StoryEditor() {
                       <input
                         type="file"
                         accept="image/*"
-                        className="hidden"
+                        className="sr-only"
                         id="cover-upload"
                         onChange={(e) => handleFileSelect(e, 'cover')}
                       />
                       <Button
                         variant="outline"
                         className="w-full"
+                        type="button"
                         onClick={() => document.getElementById('cover-upload')?.click()}
                         disabled={uploadingMedia}
                       >
@@ -371,6 +382,7 @@ export default function StoryEditor() {
                   className="w-full" 
                   onClick={handleSave}
                   disabled={saving}
+                  type="button"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   {saving ? 'Saving...' : 'Save Story'}
@@ -390,12 +402,13 @@ export default function StoryEditor() {
                   ref={fileInputRef}
                   type="file"
                   accept="image/*,video/*"
-                  className="hidden"
+                  className="sr-only"
                   onChange={(e) => handleFileSelect(e, 'media')}
                 />
                 <Button
                   variant="outline"
                   className="w-full"
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploadingMedia}
                 >

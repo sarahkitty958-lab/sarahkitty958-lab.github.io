@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -7,9 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, Save, Loader2, ImagePlus, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, Save, Loader2, ImagePlus, X, Upload } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 import { 
   fetchAdminProductById, 
   createAdminProduct, 
@@ -21,16 +23,21 @@ export default function KitEditor() {
   const isEditing = !!id;
   const navigate = useNavigate();
   const { isAdmin, loading: authLoading } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [images, setImages] = useState<string[]>([]);
-  const [productType, setProductType] = useState('Craft Kit');
+  const [productType, setProductType] = useState('Cooking Kit');
   const [tags, setTags] = useState('');
+  const [difficulty, setDifficulty] = useState('Medium');
+  const [animalName, setAnimalName] = useState('');
+  const [storyName, setStoryName] = useState('');
 
   useEffect(() => {
     if (!authLoading && !isAdmin) {
@@ -54,8 +61,25 @@ export default function KitEditor() {
         setDescription(product.description || '');
         setPrice(product.variants[0]?.price || '');
         setImages(product.images.map(img => img.src));
-        setProductType(product.productType || 'Craft Kit');
-        setTags(product.tags?.join(', ') || '');
+        setProductType(product.productType || 'Cooking Kit');
+        
+        // Parse tags to extract custom fields
+        const tagList = product.tags || [];
+        const difficultyTag = tagList.find(t => t.startsWith('difficulty:'));
+        const animalTag = tagList.find(t => t.startsWith('animal:'));
+        const storyTag = tagList.find(t => t.startsWith('story:'));
+        
+        if (difficultyTag) setDifficulty(difficultyTag.replace('difficulty:', ''));
+        if (animalTag) setAnimalName(animalTag.replace('animal:', ''));
+        if (storyTag) setStoryName(storyTag.replace('story:', ''));
+        
+        // Set remaining tags
+        const otherTags = tagList.filter(t => 
+          !t.startsWith('difficulty:') && 
+          !t.startsWith('animal:') && 
+          !t.startsWith('story:')
+        );
+        setTags(otherTags.join(', '));
       }
     } catch (error) {
       toast.error('Failed to load product');
@@ -64,7 +88,44 @@ export default function KitEditor() {
     setLoading(false);
   };
 
-  const addImage = () => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    
+    for (const file of Array.from(files)) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data, error } = await supabase.storage
+          .from('kit-images')
+          .upload(fileName, file);
+
+        if (error) {
+          toast.error(`Failed to upload ${file.name}: ${error.message}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('kit-images')
+          .getPublicUrl(fileName);
+
+        setImages(prev => [...prev, urlData.publicUrl]);
+        toast.success(`Uploaded ${file.name}`);
+      } catch (error) {
+        toast.error(`Failed to upload ${file.name}`);
+      }
+    }
+    
+    setUploading(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const addImageUrl = () => {
     if (imageUrl.trim()) {
       setImages([...images, imageUrl.trim()]);
       setImageUrl('');
@@ -85,11 +146,20 @@ export default function KitEditor() {
 
     setSaving(true);
 
+    // Build tags including custom fields
+    const allTags = [];
+    if (tags.trim()) {
+      allTags.push(...tags.split(',').map(t => t.trim()));
+    }
+    if (difficulty) allTags.push(`difficulty:${difficulty}`);
+    if (animalName.trim()) allTags.push(`animal:${animalName.trim()}`);
+    if (storyName.trim()) allTags.push(`story:${storyName.trim()}`);
+
     const productData = {
       title: title.trim(),
       body: description.trim(),
       product_type: productType,
-      tags: tags,
+      tags: allTags.join(', '),
       variants: [{ price }],
       images: images.map(src => ({ file_path: src }))
     };
@@ -147,10 +217,10 @@ export default function KitEditor() {
           </Button>
           <div>
             <h1 className="font-display text-3xl font-bold">
-              {isEditing ? 'Edit Kit' : 'Add New Kit'}
+              {isEditing ? 'Edit Cooking Kit' : 'Add New Cooking Kit'}
             </h1>
             <p className="text-muted-foreground">
-              {isEditing ? 'Update your craft kit details' : 'Create a new craft kit for your store'}
+              {isEditing ? 'Update your cooking kit details' : 'Create a new cooking kit for your store'}
             </p>
           </div>
         </div>
@@ -158,7 +228,7 @@ export default function KitEditor() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Basic Information</CardTitle>
+              <CardTitle>Kit Information</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -167,8 +237,44 @@ export default function KitEditor() {
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g., Teddy Bear Craft Kit"
+                  placeholder="e.g., Lucky's Mac and Cheese Parfait"
                   required
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="animalName">Animal Character</Label>
+                  <Input
+                    id="animalName"
+                    value={animalName}
+                    onChange={(e) => setAnimalName(e.target.value)}
+                    placeholder="e.g., Lucky (Cat)"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="difficulty">Difficulty Level</Label>
+                  <Select value={difficulty} onValueChange={setDifficulty}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select difficulty" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Easy">🟢 Easy</SelectItem>
+                      <SelectItem value="Medium">🟡 Medium</SelectItem>
+                      <SelectItem value="Hard">🔴 Hard</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="storyName">Related Story</Label>
+                <Input
+                  id="storyName"
+                  value={storyName}
+                  onChange={(e) => setStoryName(e.target.value)}
+                  placeholder="e.g., Lucky's Food Invention"
                 />
               </div>
 
@@ -178,7 +284,7 @@ export default function KitEditor() {
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your craft kit..."
+                  placeholder="Describe what's included in this cooking kit..."
                   rows={4}
                 />
               </div>
@@ -203,18 +309,18 @@ export default function KitEditor() {
                     id="productType"
                     value={productType}
                     onChange={(e) => setProductType(e.target.value)}
-                    placeholder="Craft Kit"
+                    placeholder="Cooking Kit"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="tags">Tags (comma separated)</Label>
+                <Label htmlFor="tags">Additional Tags (comma separated)</Label>
                 <Input
                   id="tags"
                   value={tags}
                   onChange={(e) => setTags(e.target.value)}
-                  placeholder="kids, crafts, bears"
+                  placeholder="kids, cooking, desserts"
                 />
               </div>
             </CardContent>
@@ -225,6 +331,39 @@ export default function KitEditor() {
               <CardTitle>Images</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* File Upload */}
+              <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label 
+                  htmlFor="image-upload" 
+                  className="cursor-pointer flex flex-col items-center gap-2"
+                >
+                  {uploading ? (
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+                  ) : (
+                    <Upload className="w-8 h-8 text-muted-foreground" />
+                  )}
+                  <span className="text-sm text-muted-foreground">
+                    {uploading ? 'Uploading...' : 'Click to upload images or drag and drop'}
+                  </span>
+                </label>
+              </div>
+
+              {/* Or add by URL */}
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-px bg-border" />
+                <span className="text-xs text-muted-foreground">OR</span>
+                <div className="flex-1 h-px bg-border" />
+              </div>
+
               <div className="flex gap-2">
                 <Input
                   value={imageUrl}
@@ -232,9 +371,9 @@ export default function KitEditor() {
                   placeholder="Enter image URL..."
                   className="flex-1"
                 />
-                <Button type="button" variant="outline" onClick={addImage}>
+                <Button type="button" variant="outline" onClick={addImageUrl}>
                   <ImagePlus className="w-4 h-4 mr-2" />
-                  Add
+                  Add URL
                 </Button>
               </div>
 

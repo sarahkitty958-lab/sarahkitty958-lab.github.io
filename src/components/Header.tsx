@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
-import { Book, ShoppingBag, HelpCircle, Info, Home, User, Settings, Package, MessageSquare, Users, FileText } from "lucide-react";
+import { Book, ShoppingBag, HelpCircle, Info, Home, User, Settings, Package, MessageSquare, Users, FileText, Palette } from "lucide-react";
 import { Button } from "./ui/button";
 import { AuthModal } from "./AuthModal";
 import { useState } from "react";
@@ -86,6 +86,13 @@ export const Header = () => {
                   {user.email}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link to="/account" className="flex items-center gap-2">
+                    <Settings className="w-4 h-4" />
+                    My Account
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 {isAdmin && (
                   <>
                     <DropdownMenuItem asChild>
@@ -116,6 +123,12 @@ export const Header = () => {
                       <Link to="/admin/content" className="flex items-center gap-2">
                         <FileText className="w-4 h-4" />
                         Edit Site Content
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/admin/avatars" className="flex items-center gap-2">
+                        <Palette className="w-4 h-4" />
+                        Character Avatars
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

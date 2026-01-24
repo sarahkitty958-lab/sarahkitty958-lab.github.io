@@ -1,8 +1,29 @@
 import { Link } from "react-router-dom";
 import { CartDrawer } from "./CartDrawer";
-import { Book, ShoppingBag, HelpCircle, Info } from "lucide-react";
+import { Book, ShoppingBag, HelpCircle, Info, Home, User, Settings } from "lucide-react";
+import { Button } from "./ui/button";
+import { AuthModal } from "./AuthModal";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Header = () => {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const { user, isAdmin, loading } = useAuth();
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out successfully");
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
@@ -13,27 +34,84 @@ export const Header = () => {
           </span>
         </Link>
         
-        <nav className="hidden md:flex items-center gap-6">
-          <Link to="/#stories" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium">
-            <Book className="w-4 h-4" />
-            Stories
-          </Link>
-          <Link to="/#shop" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium">
-            <ShoppingBag className="w-4 h-4" />
-            Shop
-          </Link>
-          <Link to="/#faq" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium">
-            <HelpCircle className="w-4 h-4" />
-            Q&A
-          </Link>
-          <Link to="/#about" className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors font-medium">
-            <Info className="w-4 h-4" />
-            About
-          </Link>
+        <nav className="hidden md:flex items-center gap-2">
+          <Button variant="ghost" asChild>
+            <Link to="/" className="flex items-center gap-2">
+              <Home className="w-4 h-4" />
+              Home
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/stories" className="flex items-center gap-2">
+              <Book className="w-4 h-4" />
+              Stories
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/shop" className="flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4" />
+              Shop
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/faq" className="flex items-center gap-2">
+              <HelpCircle className="w-4 h-4" />
+              Q&A
+            </Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link to="/about" className="flex items-center gap-2">
+              <Info className="w-4 h-4" />
+              About
+            </Link>
+          </Button>
         </nav>
 
-        <CartDrawer />
+        <div className="flex items-center gap-2">
+          {!loading && (
+            <>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <User className="w-4 h-4" />
+                      Account
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem className="text-muted-foreground text-sm">
+                      {user.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/stories" className="flex items-center gap-2">
+                            <Settings className="w-4 h-4" />
+                            Manage Stories
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button onClick={() => setAuthModalOpen(true)} size="sm">
+                  <User className="w-4 h-4 mr-2" />
+                  Sign In
+                </Button>
+              )}
+            </>
+          )}
+          <CartDrawer />
+        </div>
       </div>
+
+      <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
     </header>
   );
 };

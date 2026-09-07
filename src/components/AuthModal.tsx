@@ -214,13 +214,28 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               </div>
             )}
             
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || (mode === 'signup' && !termsAccepted)}
-            >
-              {loading ? '...' : mode === 'login' ? 'Sign In' : 'Create Account'}
-            </Button>
+            {resetSent ? (
+              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center space-y-2">
+                <p className="text-foreground font-medium">📬 Reset email sent!</p>
+                <p className="text-sm text-muted-foreground">
+                  Check your inbox for a link to create a new password.
+                </p>
+              </div>
+            ) : (
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loading || (mode === 'signup' && !termsAccepted)}
+              >
+                {loading
+                  ? '...'
+                  : mode === 'login'
+                  ? 'Sign In'
+                  : mode === 'signup'
+                  ? 'Create Account'
+                  : 'Send Reset Email'}
+              </Button>
+            )}
             
             {mode === 'signup' && !termsAccepted && (
               <p className="text-xs text-center text-muted-foreground">

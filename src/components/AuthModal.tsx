@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { TermsModal } from './TermsModal';
 import { CheckCircle, Circle } from 'lucide-react';
@@ -14,7 +15,7 @@ interface AuthModalProps {
 }
 
 export function AuthModal({ open, onOpenChange }: AuthModalProps) {
-  const [mode, setMode] = useState<'login' | 'signup'>('login');
+  const [mode, setMode] = useState<'login' | 'signup' | 'reset'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -22,6 +23,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
   const [hasReadTerms, setHasReadTerms] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
   const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +45,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         onOpenChange(false);
         resetForm();
       }
-    } else {
+    } else if (mode === 'signup') {
       const { error } = await signUp(email, password, displayName);
       if (error) {
         toast.error(error.message);
@@ -51,6 +53,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         toast.success('Account created! Welcome to Stuffed Adventures! 🧸');
         onOpenChange(false);
         resetForm();
+      }
+    } else if (mode === 'reset') {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Password reset email sent! Check your inbox 📬');
+        setResetSent(true);
       }
     }
 
@@ -63,6 +75,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setDisplayName('');
     setTermsAccepted(false);
     setHasReadTerms(false);
+    setResetSent(false);
+    setMode('login');
   };
 
   const handleOpenTerms = () => {
@@ -80,7 +94,11 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl text-center">
-              {mode === 'login' ? '🧸 Welcome Back!' : '✨ Join the Adventure!'}
+              {mode === 'login'
+                ? '🧸 Welcome Back!'
+                : mode === 'signup'
+                ? '✨ Join the Adventure!'
+                : '🔐 Reset Password'}
             </DialogTitle>
           </DialogHeader>
           
@@ -110,18 +128,31 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
-            </div>
+            {mode !== 'reset' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  {mode === 'login' && (
+                    <button
+                      type="button"
+                      onClick={() => setMode('reset')}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+              </div>
+            )}
             
             {mode === 'signup' && (
               <div className="space-y-3">
@@ -183,13 +214,28 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               </div>
             )}
             
-            <Button 
-              type="submit" 
-              className="w-full" 
-              disabled={loading || (mode === 'signup' && !termsAccepted)}
-            >
-              {loading ? '...' : mode === 'login' ? 'Sign In' : 'Create Account'}
-            </Button>
+            {resetSent ? (
+              <div className="p-4 rounded-lg bg-primary/10 border border-primary/20 text-center space-y-2">
+                <p className="text-foreground font-medium">📬 Reset email sent!</p>
+                <p className="text-sm text-muted-foreground">
+                  Check your inbox for a link to create a new password.
+                </p>
+              </div>
+            ) : (
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={loading || (mode === 'signup' && !termsAccepted)}
+              >
+                {loading
+                  ? '...'
+                  : mode === 'login'
+                  ? 'Sign In'
+                  : mode === 'signup'
+                  ? 'Create Account'
+                  : 'Send Reset Email'}
+              </Button>
+            )}
             
             {mode === 'signup' && !termsAccepted && (
               <p className="text-xs text-center text-muted-foreground">
@@ -207,6 +253,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   className="text-primary hover:underline"
                 >
                   Sign up
+                </button>
+              </>
+            ) : mode === 'reset' ? (
+              <>
+                Remember your password?{' '}
+                <button
+                  onClick={() => setMode('login')}
+                  className="text-primary hover:underline"
+                >
+                  Sign in
                 </button>
               </>
             ) : (

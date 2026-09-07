@@ -22,6 +22,7 @@ import Shop from "./pages/Shop";
 import FAQ from "./pages/FAQ";
 import About from "./pages/About";
 import Account from "./pages/Account";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 

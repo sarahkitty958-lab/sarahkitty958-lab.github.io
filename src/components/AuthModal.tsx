@@ -45,7 +45,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         onOpenChange(false);
         resetForm();
       }
-    } else {
+    } else if (mode === 'signup') {
       const { error } = await signUp(email, password, displayName);
       if (error) {
         toast.error(error.message);
@@ -53,6 +53,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         toast.success('Account created! Welcome to Stuffed Adventures! 🧸');
         onOpenChange(false);
         resetForm();
+      }
+    } else if (mode === 'reset') {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Password reset email sent! Check your inbox 📬');
+        setResetSent(true);
       }
     }
 

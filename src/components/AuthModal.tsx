@@ -75,6 +75,8 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
     setDisplayName('');
     setTermsAccepted(false);
     setHasReadTerms(false);
+    setResetSent(false);
+    setMode('login');
   };
 
   const handleOpenTerms = () => {

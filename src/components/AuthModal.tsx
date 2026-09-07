@@ -255,6 +255,16 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   Sign up
                 </button>
               </>
+            ) : mode === 'reset' ? (
+              <>
+                Remember your password?{' '}
+                <button
+                  onClick={() => setMode('login')}
+                  className="text-primary hover:underline"
+                >
+                  Sign in
+                </button>
+              </>
             ) : (
               <>
                 Already have an account?{' '}

@@ -94,7 +94,11 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="font-display text-2xl text-center">
-              {mode === 'login' ? '🧸 Welcome Back!' : '✨ Join the Adventure!'}
+              {mode === 'login'
+                ? '🧸 Welcome Back!'
+                : mode === 'signup'
+                ? '✨ Join the Adventure!'
+                : '🔐 Reset Password'}
             </DialogTitle>
           </DialogHeader>
           

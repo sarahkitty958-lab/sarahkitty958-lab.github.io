@@ -48,6 +48,7 @@ function AppContent() {
         <Route path="/admin/content" element={<AdminContent />} />
         <Route path="/admin/avatars" element={<AdminAvatars />} />
         <Route path="/account" element={<Account />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/faq" element={<FAQ />} />
         <Route path="/about" element={<About />} />

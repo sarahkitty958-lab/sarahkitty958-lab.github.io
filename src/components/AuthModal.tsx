@@ -148,7 +148,7 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  required={mode !== 'reset'}
+                  required
                   minLength={6}
                 />
               </div>

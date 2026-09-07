@@ -128,18 +128,31 @@ export function AuthModal({ open, onOpenChange }: AuthModalProps) {
               />
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
-            </div>
+            {mode !== 'reset' && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  {mode === 'login' && (
+                    <button
+                      type="button"
+                      onClick={() => setMode('reset')}
+                      className="text-xs text-primary hover:underline"
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required={mode !== 'reset'}
+                  minLength={6}
+                />
+              </div>
+            )}
             
             {mode === 'signup' && (
               <div className="space-y-3">

@@ -1,4 +1,4 @@
-# Stuffed Adventures Emporium
+ # Stuffed Adventures Emporium
 
 Hey, can you create an website for my short stories, Stuffed Adventures? Do you want me to give you the stories? And can you arrange it so that they can view the stories, and also buy my kits based on my stories, and a Q&A, with Information?
 
